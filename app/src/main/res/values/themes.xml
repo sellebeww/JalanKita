@@ -1,0 +1,11 @@
+<resources>
+    <!--
+      Pure-Compose app: this XML theme only styles the window before the first
+      frame. All real UI styling lives in ui/theme/Theme.kt.
+    -->
+    <style name="Theme.JalanKita" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/jk_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

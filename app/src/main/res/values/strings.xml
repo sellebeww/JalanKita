@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">JalanKita</string>
+    <string name="app_tagline">Laporkan kerusakan jalan dengan mudah, cepat, dan tepat.</string>
+    <string name="sync_channel_name">Sinkronisasi Laporan</string>
+    <string name="status_channel_name">Status Laporan</string>
+    <string name="proximity_channel_name">Peringatan Jalan Rusak</string>
+</resources>

@@ -1,0 +1,15 @@
+# Copy to local.properties and fill in. local.properties is git-ignored:
+# never commit real credentials.
+
+# Android SDK location (Android Studio / IntelliJ writes this for you).
+sdk.dir=/Users/you/Library/Android/sdk
+
+# Supabase project — Project Settings > API.
+# Use the ANON / publishable key only. The service_role key must never ship
+# inside an Android app: it bypasses Row Level Security.
+SUPABASE_URL=YOUR_SUPABASE_URL
+SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+
+# Google Maps SDK for Android key, restricted to this app's package name and
+# SHA-1 signing certificate.
+GOOGLE_MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY
