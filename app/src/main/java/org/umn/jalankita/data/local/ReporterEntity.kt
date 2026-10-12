@@ -9,7 +9,7 @@ import org.umn.jalankita.model.ReporterProfile
  *
  * Kept as its own table rather than derived from [ReportEntity] because a
  * community report's author usually has history this device has never seen: the
- * counts come from the server (or, in demo mode, from the seeded community) and
+ * counts come from the server (or, in local storage, from the seeded community) and
  * must survive even when only one of their reports is stored locally.
  */
 @Entity(tableName = "reporters")

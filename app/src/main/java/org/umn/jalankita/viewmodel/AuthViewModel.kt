@@ -43,7 +43,7 @@ data class RegisterUiState(
 
 /**
  * "Lupa Password". What the sheet asks for depends on the backend: Supabase can
- * mail a link, while a demo account lives on this device and can simply be given
+ * mail a link, while a local account lives on this device and can simply be given
  * a new password.
  */
 data class ForgotPasswordUiState(
@@ -89,8 +89,8 @@ class AuthViewModel(
 
     val authState: StateFlow<AuthState> = authRepository.authState
 
-    /** True when no Supabase project is configured and the local demo store is in use. */
-    val isDemoMode: Boolean = !authRepository.isBackedByServer
+    /** True when no Supabase project is configured and the local store is in use. */
+    val isLocalOnly: Boolean = !authRepository.isBackedByServer
 
     val passwordResetMode: PasswordResetMode = authRepository.passwordResetMode
 
@@ -131,17 +131,6 @@ class AuthViewModel(
 
     fun setRememberMe(enabled: Boolean) {
         _login.value = _login.value.copy(rememberMe = enabled)
-    }
-
-    /** Fills the demo account in, so the app can be opened without typing. */
-    fun prefillCredentials(email: String, password: String) {
-        _login.value = _login.value.copy(
-            email = email,
-            password = password,
-            emailError = null,
-            passwordError = null,
-            formError = null,
-        )
     }
 
     fun submitLogin() {

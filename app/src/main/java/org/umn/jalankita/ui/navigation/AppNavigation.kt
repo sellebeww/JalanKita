@@ -23,7 +23,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import androidx.navigation.compose.rememberNavController
-import org.umn.jalankita.data.demo.DemoCredentials
 import org.umn.jalankita.di.LocalAppContainer
 import org.umn.jalankita.di.appViewModel
 import org.umn.jalankita.model.AuthState
@@ -133,18 +132,12 @@ fun AppNavigation(
                     RedirectWhenSignedIn(authState) { navController.navigateAsRoot(Routes.HOME) }
                     LoginScreen(
                         state = state,
-                        isDemoMode = authViewModel.isDemoMode,
+                        isLocalOnly = authViewModel.isLocalOnly,
                         onEmailChange = authViewModel::onLoginEmailChange,
                         onPasswordChange = authViewModel::onLoginPasswordChange,
                         onTogglePasswordVisibility = authViewModel::toggleLoginPasswordVisibility,
                         onRememberMeChange = authViewModel::setRememberMe,
                         onForgotPassword = authViewModel::openForgotPassword,
-                        onUseDemoAccount = {
-                            authViewModel.prefillCredentials(
-                                DemoCredentials.EMAIL,
-                                DemoCredentials.PASSWORD,
-                            )
-                        },
                         onSubmit = authViewModel::submitLogin,
                         onNavigateToRegister = { navController.navigate(Routes.REGISTER) },
                     )
@@ -268,7 +261,6 @@ fun AppNavigation(
                         state = state,
                         onThemeModeChange = settingsViewModel::setThemeMode,
                         onSyncNow = container::requestManualSync,
-                        onReloadSamples = container::reseedSampleData,
                         onBack = { navController.popBackStack() },
                     )
                 }

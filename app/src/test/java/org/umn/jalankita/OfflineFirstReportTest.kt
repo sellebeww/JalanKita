@@ -1,5 +1,6 @@
 package org.umn.jalankita
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -8,6 +9,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.umn.jalankita.data.repository.ReportRepository
+import org.umn.jalankita.data.repository.ReportSyncTrigger
 import org.umn.jalankita.fake.FakeConnectivityMonitor
 import org.umn.jalankita.fake.FakeNotificationDao
 import org.umn.jalankita.fake.FakeReportDao
@@ -78,9 +80,31 @@ class OfflineFirstReportTest {
         assertTrue(outcome.synced)
         assertEquals(listOf(reportId), trigger.syncNowCalls)
         assertNotNull(dao.getReportById(reportId))
-        // Already delivered: no background pass needs queuing, and the engine
-        // owns the "berhasil dikirim" notification.
-        assertEquals(0, trigger.requestSyncCalls)
+        // Recovery is scheduled before the immediate send; a later pass is a no-op.
+        assertEquals(1, trigger.requestSyncCalls)
+    }
+
+    @Test
+    fun `cancelled immediate send leaves a stored report with recovery already queued`() = runTest {
+        val dao = FakeReportDao()
+        val notifications = FakeNotificationDao()
+        var queued = false
+        val cancellation = CancellationException("Screen closed")
+        val trigger = object : ReportSyncTrigger {
+            override fun requestSync() { queued = true }
+            override suspend fun syncNow(reportId: String): Boolean {
+                assertNotNull(dao.getReportById(reportId))
+                assertTrue("Recovery must precede the upload", queued)
+                throw cancellation
+            }
+        }
+        val repo = ReportRepository(dao, notifications, FakeConnectivityMonitor(true), trigger)
+
+        val result = runCatching { repo.submitSample() }
+
+        assertTrue(result.exceptionOrNull() === cancellation)
+        assertEquals(SyncStatus.PENDING_SYNC.id, dao.getReportById(reportId)!!.syncStatus)
+        assertTrue(notifications.rows.value.isEmpty())
     }
 
     @Test

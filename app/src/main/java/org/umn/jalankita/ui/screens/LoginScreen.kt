@@ -49,7 +49,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import org.umn.jalankita.data.demo.DemoCredentials
 import org.umn.jalankita.ui.components.AppCard
 import org.umn.jalankita.ui.components.AppPasswordField
 import org.umn.jalankita.ui.components.AppTextField
@@ -73,13 +72,12 @@ import org.umn.jalankita.viewmodel.LoginUiState
 @Composable
 fun LoginScreen(
     state: LoginUiState,
-    isDemoMode: Boolean,
+    isLocalOnly: Boolean,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onTogglePasswordVisibility: () -> Unit,
     onRememberMeChange: (Boolean) -> Unit,
     onForgotPassword: () -> Unit,
-    onUseDemoAccount: () -> Unit,
     onSubmit: () -> Unit,
     onNavigateToRegister: () -> Unit,
 ) {
@@ -123,9 +121,9 @@ fun LoginScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
 
-                    if (isDemoMode) {
+                    if (isLocalOnly) {
                         Spacer(Modifier.height(Spacing.lg))
-                        DemoAccountHint(onUseDemoAccount = onUseDemoAccount, enabled = !state.isSubmitting)
+                        org.umn.jalankita.ui.components.LocalStorageBanner()
                     }
 
                     Spacer(Modifier.height(Spacing.xl))
@@ -287,46 +285,6 @@ private fun ValueProp(icon: ImageVector, title: String, body: String, modifier: 
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
-    }
-}
-
-/**
- * Demo builds ship with a ready account; showing it beats making someone guess,
- * and the button fills the form so the app can be opened in one tap.
- */
-@Composable
-private fun DemoAccountHint(onUseDemoAccount: () -> Unit, enabled: Boolean) {
-    Surface(
-        color = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        shape = MaterialTheme.shapes.small,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(Modifier.padding(Spacing.lg)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Outlined.AutoAwesome,
-                    contentDescription = null,
-                    modifier = Modifier.size(Dimens.iconMd),
-                )
-                Spacer(Modifier.size(Spacing.sm))
-                Text(text = "Mode Demo", style = MaterialTheme.typography.titleSmall)
-            }
-            Spacer(Modifier.height(Spacing.xs))
-            Text(
-                text = "Akun contoh sudah tersedia di perangkat ini:\n" +
-                    "${DemoCredentials.EMAIL} · ${DemoCredentials.PASSWORD}",
-                style = MaterialTheme.typography.bodySmall,
-            )
-            Spacer(Modifier.height(Spacing.sm))
-            TextButton(
-                onClick = onUseDemoAccount,
-                enabled = enabled,
-                contentPadding = PaddingValues(horizontal = Spacing.md, vertical = Spacing.xs),
-            ) {
-                Text("Gunakan Akun Demo", style = MaterialTheme.typography.labelMedium)
-            }
-        }
     }
 }
 

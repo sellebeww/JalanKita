@@ -38,7 +38,7 @@ import org.umn.jalankita.BuildConfig
 import org.umn.jalankita.model.ThemeMode
 import org.umn.jalankita.ui.components.AppCard
 import org.umn.jalankita.ui.components.AppTopBar
-import org.umn.jalankita.ui.components.DemoModeBanner
+import org.umn.jalankita.ui.components.LocalStorageBanner
 import org.umn.jalankita.ui.components.DetailRow
 import org.umn.jalankita.ui.components.RowDivider
 import org.umn.jalankita.ui.components.SecondaryButton
@@ -57,11 +57,9 @@ fun SettingsScreen(
     state: SettingsUiState,
     onThemeModeChange: (ThemeMode) -> Unit,
     onSyncNow: () -> Unit,
-    onReloadSamples: () -> Unit,
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
-    var samplesReloaded by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -75,7 +73,7 @@ fun SettingsScreen(
                 .padding(horizontal = Dimens.screenPadding),
             verticalArrangement = Arrangement.spacedBy(Spacing.md),
         ) {
-            if (state.isDemoMode) DemoModeBanner()
+            if (state.isLocalOnly) LocalStorageBanner()
 
             AppCard {
                 SettingHeader(Icons.Outlined.SettingsBrightness, "Tampilan", "Pilih tema aplikasi.")
@@ -107,7 +105,7 @@ fun SettingsScreen(
                 SettingHeader(
                     icon = Icons.Outlined.CloudSync,
                     title = "Sinkronisasi",
-                    subtitle = "Laporan dikirim otomatis saat perangkat kembali online.",
+                    subtitle = if (state.isLocalOnly) "Laporan tersimpan di perangkat. Hubungkan Supabase untuk pengiriman." else "Laporan dikirim otomatis saat perangkat kembali online.",
                 )
                 Spacer(Modifier.height(Spacing.md))
                 DetailRow("Koneksi", if (state.isOnline) "Online" else "Offline")
@@ -125,7 +123,7 @@ fun SettingsScreen(
                     text = if (state.isOnline) "Sinkronkan Sekarang" else "Menunggu Koneksi",
                     onClick = onSyncNow,
                     icon = Icons.Outlined.CloudSync,
-                    enabled = state.isOnline && state.unsyncedCount > 0,
+                    enabled = !state.isLocalOnly && state.isOnline && state.unsyncedCount > 0,
                 )
             }
 
@@ -142,31 +140,10 @@ fun SettingsScreen(
                 )
             }
 
-            if (state.isDemoMode) {
-                AppCard {
-                    SettingHeader(
-                        icon = Icons.Outlined.Restore,
-                        title = "Contoh Laporan",
-                        subtitle = "Muat ulang lima laporan contoh beserta notifikasinya. " +
-                            "Laporan Anda sendiri tidak terpengaruh.",
-                    )
-                    Spacer(Modifier.height(Spacing.md))
-                    SecondaryButton(
-                        text = if (samplesReloaded) "Contoh Dimuat Ulang" else "Muat Ulang Contoh",
-                        onClick = {
-                            onReloadSamples()
-                            samplesReloaded = true
-                        },
-                        icon = Icons.Outlined.Restore,
-                        enabled = !samplesReloaded,
-                    )
-                }
-            }
-
             AppCard {
                 DetailRow("Versi", "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
                 RowDivider()
-                DetailRow("Backend", if (state.isDemoMode) "Mode demo lokal" else "Supabase")
+                DetailRow("Backend", if (state.isLocalOnly) "Penyimpanan lokal" else "Supabase")
             }
 
             Spacer(Modifier.height(Spacing.xxl))

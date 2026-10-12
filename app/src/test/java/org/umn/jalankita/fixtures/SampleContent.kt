@@ -1,4 +1,4 @@
-package org.umn.jalankita.data.demo
+package org.umn.jalankita.fixtures
 
 import org.umn.jalankita.data.local.NotificationEntity
 import org.umn.jalankita.data.local.ReportEntity

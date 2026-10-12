@@ -10,7 +10,7 @@ import org.umn.jalankita.data.local.toDomain
 import org.umn.jalankita.data.location.nearbyDamage
 import org.umn.jalankita.model.ReporterLevel
 import org.umn.jalankita.model.ReportStatus
-import org.umn.jalankita.data.demo.SampleContent
+import org.umn.jalankita.fixtures.SampleContent
 import org.umn.jalankita.fake.FakeNotificationDao
 import org.umn.jalankita.fake.FakeReportDao
 import org.umn.jalankita.model.DamageCategory

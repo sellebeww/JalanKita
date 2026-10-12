@@ -9,20 +9,20 @@ enum class PasswordResetMode {
     /** Supabase sends a reset link to the address. */
     EMAIL_LINK,
 
-    /** Demo accounts live on this device, so a new password can be set directly. */
+    /** Local accounts live on this device, so a new password can be set directly. */
     ON_DEVICE,
 }
 
 /**
  * Authentication seam. [SupabaseAuthRepository] is the real implementation;
- * [DemoAuthRepository] takes over only when no Supabase project is configured,
+ * [LocalAuthRepository] takes over only when no Supabase project is configured,
  * so the app is still runnable and is labelled as such in the UI.
  */
 interface AuthRepository {
 
     val authState: StateFlow<AuthState>
 
-    /** False when running against the local demo account store. */
+    /** False when running against the local account store. */
     val isBackedByServer: Boolean
 
     val passwordResetMode: PasswordResetMode

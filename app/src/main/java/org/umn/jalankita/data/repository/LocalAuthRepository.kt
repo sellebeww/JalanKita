@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.umn.jalankita.data.demo.DemoCredentials
 import org.umn.jalankita.data.local.SessionStore
 import org.umn.jalankita.model.AuthState
 import org.umn.jalankita.model.UserProfile
@@ -13,20 +12,13 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.UUID
 
-/**
- * On-device account store used only when SUPABASE_URL / SUPABASE_ANON_KEY are absent.
- *
- * This exists so the app can be installed and demonstrated without credentials —
- * it is NOT a stand-in for the real backend, and the UI shows a "Mode Demo" banner
- * whenever it is active. Passwords are never kept in clear text: only a salted
- * SHA-256 digest is stored.
- */
-class DemoAuthRepository(
+/** On-device accounts used until Supabase is configured; passwords are stored as salted digests. */
+class LocalAuthRepository(
     private val sessionStore: SessionStore,
 ) : AuthRepository {
 
     @Serializable
-    private data class DemoAccount(
+    private data class LocalAccount(
         val id: String,
         val name: String,
         val email: String,
@@ -43,8 +35,6 @@ class DemoAuthRepository(
     override val passwordResetMode: PasswordResetMode = PasswordResetMode.ON_DEVICE
 
     override suspend fun restoreSession() {
-        ensureDefaultAccount()
-
         // A session opened during this run wins over anything cached on disk.
         if (_authState.value is AuthState.SignedIn) return
 
@@ -85,7 +75,7 @@ class DemoAuthRepository(
         }
 
         val salt = newSalt()
-        val account = DemoAccount(
+        val account = LocalAccount(
             id = UUID.randomUUID().toString(),
             name = name.trim(),
             email = normalized,
@@ -109,7 +99,7 @@ class DemoAuthRepository(
     }
 
     /**
-     * Demo accounts only exist on this device, so there is nothing to mail a link
+     * Local accounts only exist on this device, so there is nothing to mail a link
      * to: the new password is set here and now, which is honest about what is
      * actually happening.
      */
@@ -148,33 +138,13 @@ class DemoAuthRepository(
         _authState.value = AuthState.SignedIn(profile)
     }
 
-    /**
-     * Creates the ready-to-use demo account on first launch so the app can be
-     * opened without registering. Never overwrites an existing account.
-     */
-    private suspend fun ensureDefaultAccount() {
-        val accounts = readAccounts()
-        if (accounts.any { it.email == DemoCredentials.EMAIL }) return
-
-        val salt = newSalt()
-        writeAccounts(
-            accounts + DemoAccount(
-                id = DEFAULT_ACCOUNT_ID,
-                name = DemoCredentials.NAME,
-                email = DemoCredentials.EMAIL,
-                salt = salt,
-                passwordHash = hash(DemoCredentials.PASSWORD, salt),
-            ),
-        )
+    private suspend fun readAccounts(): List<LocalAccount> {
+        val raw = sessionStore.readLocalAccounts() ?: return emptyList()
+        return runCatching { json.decodeFromString<List<LocalAccount>>(raw) }.getOrDefault(emptyList())
     }
 
-    private suspend fun readAccounts(): List<DemoAccount> {
-        val raw = sessionStore.readDemoAccounts() ?: return emptyList()
-        return runCatching { json.decodeFromString<List<DemoAccount>>(raw) }.getOrDefault(emptyList())
-    }
-
-    private suspend fun writeAccounts(accounts: List<DemoAccount>) {
-        sessionStore.writeDemoAccounts(json.encodeToString(accounts))
+    private suspend fun writeAccounts(accounts: List<LocalAccount>) {
+        sessionStore.writeLocalAccounts(json.encodeToString(accounts))
     }
 
     private fun newSalt(): String {
@@ -190,8 +160,4 @@ class DemoAuthRepository(
 
     private fun ByteArray.toHex(): String = joinToString("") { "%02x".format(it) }
 
-    private companion object {
-        /** Fixed so the sample reports keep belonging to this account across installs. */
-        const val DEFAULT_ACCOUNT_ID = "5661a0e4-9d3f-4a1b-8f27-0c9a1e7b4d20"
-    }
 }

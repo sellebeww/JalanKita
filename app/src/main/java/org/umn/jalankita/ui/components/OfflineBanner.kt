@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -63,7 +62,7 @@ fun OfflineBanner(
 
 /** Shown when the app runs without a configured Supabase project. */
 @Composable
-fun DemoModeBanner(modifier: Modifier = Modifier) {
+fun LocalStorageBanner(modifier: Modifier = Modifier) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -75,15 +74,15 @@ fun DemoModeBanner(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = Icons.Outlined.Science,
+                imageVector = Icons.Outlined.CloudOff,
                 contentDescription = null,
                 tint = StatusOrange,
                 modifier = Modifier.size(Dimens.iconMd),
             )
             Spacer(Modifier.size(Spacing.md))
             Text(
-                text = "Mode Demo — Supabase belum dikonfigurasi, akun dan laporan " +
-                    "hanya tersimpan di perangkat ini.",
+                text = "Penyimpanan lokal — akun dan laporan " +
+                    "tersimpan di perangkat ini. Pengiriman memerlukan koneksi Supabase.",
                 style = MaterialTheme.typography.bodySmall,
             )
         }

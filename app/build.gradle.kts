@@ -123,6 +123,7 @@ dependencies {
 
     // Images
     implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

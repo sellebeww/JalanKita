@@ -82,6 +82,7 @@ ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.r
 
 # --- Images ---
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 
 # --- Test ---
 junit = { group = "junit", name = "junit", version.ref = "junit" }

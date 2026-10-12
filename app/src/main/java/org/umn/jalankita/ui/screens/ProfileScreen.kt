@@ -48,7 +48,7 @@ import org.umn.jalankita.BuildConfig
 import org.umn.jalankita.ui.components.AppCard
 import org.umn.jalankita.ui.components.AppTextField
 import org.umn.jalankita.ui.components.AppTopBar
-import org.umn.jalankita.ui.components.DemoModeBanner
+import org.umn.jalankita.ui.components.LocalStorageBanner
 import org.umn.jalankita.ui.components.LoadingView
 import org.umn.jalankita.ui.components.RowDivider
 import org.umn.jalankita.ui.components.SecondaryButton
@@ -104,7 +104,7 @@ fun ProfileScreen(
                 onEdit = { dialog = ProfileDialog.EditName },
             )
 
-            if (state.isDemoMode) DemoModeBanner()
+            if (state.isLocalOnly) LocalStorageBanner()
 
             AppCard {
                 Text(
@@ -175,7 +175,7 @@ fun ProfileScreen(
                         "Laporan selalu disimpan di perangkat lebih dulu, lalu dikirim " +
                         "otomatis saat koneksi tersedia.\n\n" +
                         "Versi ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})\n" +
-                        "Backend: " + if (state.isDemoMode) "mode demo lokal" else "Supabase",
+                        "Backend: " + if (state.isLocalOnly) "penyimpanan lokal" else "Supabase",
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },

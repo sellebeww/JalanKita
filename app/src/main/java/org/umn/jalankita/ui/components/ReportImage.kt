@@ -44,17 +44,17 @@ fun ReportImage(
             .background(MaterialTheme.colorScheme.surfaceVariant),
         contentAlignment = Alignment.Center,
     ) {
+        // Keep a category preview visible while loading or if the photo fails.
+        DamageIllustration(
+            category = report.category,
+            shape = shape,
+            modifier = Modifier.fillMaxSize(),
+        )
         if (model != null) {
             AsyncImage(
                 model = model,
                 contentDescription = "Foto kerusakan ${report.category.label}",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
-        } else {
-            DamageIllustration(
-                category = report.category,
-                shape = shape,
                 modifier = Modifier.fillMaxSize(),
             )
         }

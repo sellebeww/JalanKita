@@ -47,7 +47,7 @@ import org.umn.jalankita.viewmodel.ForgotPasswordUiState
  * "Lupa Password".
  *
  * What it offers depends on where the account actually lives. Supabase owns the
- * credential, so the only honest action is to mail a reset link. A demo account
+ * credential, so the only honest action is to mail a reset link. A local account
  * lives on this device, so it can be given a new password immediately — rather
  * than pretending to send an email that nothing would deliver.
  */
@@ -105,7 +105,7 @@ fun ForgotPasswordDialog(
                 Spacer(Modifier.height(Spacing.xs))
                 Text(
                     text = if (onDevice) {
-                        "Akun mode demo tersimpan di perangkat ini, jadi password " +
+                        "Akun lokal tersimpan di perangkat ini, jadi password " +
                             "dapat langsung diatur ulang di sini."
                     } else {
                         "Masukkan email terdaftar. Kami akan mengirim tautan untuk " +

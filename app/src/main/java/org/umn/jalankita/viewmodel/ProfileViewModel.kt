@@ -13,7 +13,7 @@ import org.umn.jalankita.model.UserProfile
 data class ProfileUiState(
     val user: UserProfile? = null,
     val stats: ReportStats = ReportStats(),
-    val isDemoMode: Boolean = false,
+    val isLocalOnly: Boolean = false,
     val isLoading: Boolean = true,
 )
 
@@ -29,12 +29,12 @@ class ProfileViewModel(
         ProfileUiState(
             user = user,
             stats = stats,
-            isDemoMode = !authRepository.isBackedByServer,
+            isLocalOnly = !authRepository.isBackedByServer,
             isLoading = false,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = ProfileUiState(isDemoMode = !authRepository.isBackedByServer),
+        initialValue = ProfileUiState(isLocalOnly = !authRepository.isBackedByServer),
     )
 }

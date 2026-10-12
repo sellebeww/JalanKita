@@ -14,7 +14,7 @@ import org.umn.jalankita.util.ConnectivityMonitor
 
 data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val isDemoMode: Boolean = false,
+    val isLocalOnly: Boolean = false,
     val isOnline: Boolean = true,
     val unsyncedCount: Int = 0,
 )
@@ -26,7 +26,7 @@ class SettingsViewModel(
     networkMonitor: ConnectivityMonitor,
 ) : UserScopedViewModel(authRepository) {
 
-    private val demoMode = !authRepository.isBackedByServer
+    private val localOnly = !authRepository.isBackedByServer
 
     val uiState: StateFlow<SettingsUiState> = combine(
         sessionStore.themeMode,
@@ -35,14 +35,14 @@ class SettingsViewModel(
     ) { theme, online, unsynced ->
         SettingsUiState(
             themeMode = theme,
-            isDemoMode = demoMode,
+            isLocalOnly = localOnly,
             isOnline = online,
             unsyncedCount = unsynced,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = SettingsUiState(isDemoMode = demoMode),
+        initialValue = SettingsUiState(isLocalOnly = localOnly),
     )
 
     fun setThemeMode(mode: ThemeMode) {

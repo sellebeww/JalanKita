@@ -1,5 +1,6 @@
 package org.umn.jalankita.data.repository
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -116,12 +117,20 @@ open class ReportRepository(
             updatedAt = now,
         )
         reportDao.insertReport(entity)
+        // Schedule recovery before any further suspending work or network call.
+        syncTrigger.requestSync()
         // The reporter's own card should count this the moment it is stored.
         reporterName?.let { refreshReporterStats(userId, it) }
 
         // Only try an immediate send when there is something to send over.
         val synced = if (networkMonitor.currentlyOnline()) {
-            runCatching { syncTrigger.syncNow(reportId) }.getOrDefault(false)
+            try {
+                syncTrigger.syncNow(reportId)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                false
+            }
         } else {
             false
         }
@@ -130,9 +139,7 @@ open class ReportRepository(
             // The sync engine already recorded "Laporan berhasil dikirim"; adding a
             // second notification here would double it.
         } else {
-            // Not delivered yet: hand it to WorkManager and tell the user plainly
-            // that waiting is normal, not a failure.
-            syncTrigger.requestSync()
+            // Recovery is already queued; waiting is normal, not a failure.
             addNotification(
                 userId = userId,
                 title = "Laporan tersimpan di perangkat",

@@ -23,7 +23,7 @@ class SessionStore(private val context: Context) {
         val USER_ID = stringPreferencesKey("user_id")
         val USER_NAME = stringPreferencesKey("user_name")
         val USER_EMAIL = stringPreferencesKey("user_email")
-        val DEMO_ACCOUNTS = stringPreferencesKey("demo_accounts")
+        val LOCAL_ACCOUNTS = stringPreferencesKey("local_accounts")
         val REMEMBER_ME = booleanPreferencesKey("remember_me")
         val LAST_EMAIL = stringPreferencesKey("last_email")
         val THEME_MODE = stringPreferencesKey("theme_mode")
@@ -94,12 +94,16 @@ class SessionStore(private val context: Context) {
         context.sessionDataStore.edit { it[Keys.THEME_MODE] = mode.id }
     }
 
-    // --- Demo account store ---
+    // --- Local account store ---
 
-    suspend fun readDemoAccounts(): String? = context.sessionDataStore.data.first()[Keys.DEMO_ACCOUNTS]
+    suspend fun readLocalAccounts(): String? {
+        val preferences = context.sessionDataStore.data.first()
+        return preferences[Keys.LOCAL_ACCOUNTS]
+            ?: preferences.asMap().entries.firstOrNull { it.key.name.endsWith("_accounts") }?.value as? String
+    }
 
-    suspend fun writeDemoAccounts(serialized: String) {
-        context.sessionDataStore.edit { it[Keys.DEMO_ACCOUNTS] = serialized }
+    suspend fun writeLocalAccounts(serialized: String) {
+        context.sessionDataStore.edit { it[Keys.LOCAL_ACCOUNTS] = serialized }
     }
 
     // --- One-time sample content, keyed per user ---

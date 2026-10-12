@@ -1,11 +1,15 @@
 package org.umn.jalankita.ui.components
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import org.umn.jalankita.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -45,6 +49,15 @@ fun DamageIllustration(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.medium,
 ) {
+    if (category == DamageCategory.POTHOLE) {
+        Image(
+            painter = painterResource(R.drawable.jalan_berlubang),
+            contentDescription = "Ilustrasi kategori jalan berlubang",
+            contentScale = ContentScale.Crop,
+            modifier = modifier.clip(shape),
+        )
+        return
+    }
     Box(modifier = modifier.clip(shape)) {
         Canvas(Modifier.fillMaxSize()) {
             drawAsphalt()

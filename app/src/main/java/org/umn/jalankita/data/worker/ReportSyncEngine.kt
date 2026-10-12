@@ -1,6 +1,9 @@
 package org.umn.jalankita.data.worker
 
 import android.util.Log
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.umn.jalankita.data.local.NotificationDao
 import org.umn.jalankita.data.local.NotificationEntity
 import org.umn.jalankita.data.local.ReportDao
@@ -58,8 +61,15 @@ class ReportSyncEngine(
         return SyncSummary(attempted = pending.size, succeeded = succeeded, failed = failed)
     }
 
+    private val syncMutex = Mutex()
+
     /** Returns true only when the report is confirmed stored on the server. */
-    suspend fun syncReport(reportId: String): Boolean {
+    // Immediate sends and background passes share the same engine.
+    suspend fun syncReport(reportId: String): Boolean = syncMutex.withLock {
+        syncReportLocked(reportId)
+    }
+
+    private suspend fun syncReportLocked(reportId: String): Boolean {
         val entity = reportDao.getReportById(reportId) ?: return false
         if (entity.syncStatus == SyncStatus.SYNCED.id) return true
         if (!networkMonitor.currentlyOnline()) return false
@@ -94,7 +104,9 @@ class ReportSyncEngine(
                 isStatusChange = false,
             )
             true
-        } catch (error: Throwable) {
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
             Log.w(TAG, "Sync failed for $reportId", error)
             // Still offline? That is pending, not failed.
             val nextStatus = if (networkMonitor.currentlyOnline()) {
